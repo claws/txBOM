@@ -1,7 +1,7 @@
 txBOM
 =============
 
-txBOM is a Python Twisted package that allows you to iretrieve forecasts and observations
+txBOM is a Python Twisted package that allows you to retrieve forecasts and observations
 from the Australian Bureau of Meteorology.
 Use it to integrate non blocking retrieval of Australian Bureau of Meteorology forecasts
 and observations into your Python Twisted application.
@@ -95,7 +95,7 @@ Retrieve the latest observations for Adelaide::
 
 
 
-Use the observations client to maintain up to date observations
+Use the observations client to maintain up to date observations::
 
     from twisted.internet import reactor
     import logging
