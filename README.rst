@@ -40,7 +40,7 @@ For other download options (zip, tarball) visit the github web page of `txCurren
 Example
 =======
 
-Retrieve the forecast for Adelaide::
+Perform a one off retrieval of the current weather forecast for Adelaide::
 
     from twisted.internet import reactor
     import logging
@@ -69,7 +69,7 @@ Retrieve the forecast for Adelaide::
     reactor.run()
 
 
-Retrieve the latest observations for Adelaide::
+Perform a one off retrieval of weather observations for Adelaide::
 
     from twisted.internet import reactor
     import logging
@@ -95,7 +95,7 @@ Retrieve the latest observations for Adelaide::
 
 
 
-Use the observations client to maintain up to date observations::
+Use the observations client to maintain up to date observations (use Ctrl+C to exit script)::
 
     from twisted.internet import reactor
     import logging
@@ -115,10 +115,19 @@ Use the observations client to maintain up to date observations::
         else:
             print "No observations"
 
-    client = Client(observation_url)
+
+    client = txBOM.observations.Client(observation_url)
+
+    # strart the client's periodic observations update service.
     reactor.callWhenRunning(client.start)
+
+    # create a looping call that executes every minute that
+    # will print out the client's current observations data.
+    # If the script is left to run it should be observed that
+    # the client updates its store of observations periodically.
     c = LoopingCall(print_current_observation, client)
     c.start(60)
+
     reactor.run()
     
 
@@ -126,6 +135,7 @@ Use the observations client to maintain up to date observations::
 Todo
 ====
 
-* N/A
+* Investigate adding locations (State, City) as a separate package so that users don't need to determine
+  the forecast identifier or observation url.
 
 
