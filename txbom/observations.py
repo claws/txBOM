@@ -6,7 +6,7 @@ Retrieve observations from the BOM
 import datetime
 import logging
 import json
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.task import LoopingCall
 from twisted.web.client import getPage
 
@@ -207,12 +207,6 @@ class Observations(object):
     
 
 
-
-
-
-
-
-
 class Client(object):
     """
     The observations client allows a user to obtain BoM observations for a
@@ -253,8 +247,9 @@ class Client(object):
         """
         if self.observation_url is None:
             logging.error("Can't start periodic observations retrieval as no URL is set")
+            return
+        
         logging.info('BoM Observation Client starting')
-
         # Obtain the first observation right now. Inspect the update timestamp
         # attribute so we can determine the time until the next update which 
         # will determine the time at which the periodic update task will begin.
@@ -271,8 +266,9 @@ class Client(object):
         if self.periodicRetrievalTask:
             self.periodicRetrievalTask.stop()
             self.periodicRetrievalTask = None
-
     
+
+    @defer.inlineCallbacks
     def retrieveFirstObservations(self):
         """
         Retrieve the first BOM observations and inspect it for the most recent
@@ -280,87 +276,81 @@ class Client(object):
         observation update and schedule the BOM retrieval task to begin running
         periodically at the calculated delay interval.
         """
-        
-        def retrievalSuccess(observations):
-            """
-            Store the current observations data. Inspect the update time contained
-            in the most recent observation and use that time to determine when to
-            begin the periodic observations refresh routine.
-            """
+        try:
+            observations = yield self.get_observations(self.observation_url)
             self.observations = observations
             
             if observations.current.aifstime_utc:
                 refresh_utc = datetime.datetime.strptime(observations.current.aifstime_utc, "%Y%m%d%H%M%S")
-                now_utc = datetime.datetime.utcnow()
                 # While the update timestamp within the data indicates an update interval
-                # of 30 minutes the updates at the BoM web site seem to occur at 5 minutes 
-                # past every half hour so the real time to the next update is 30 minutes 
-                # (for the data) + 5 minutes (for the web server to receive the data update)
-                # + 2 minutes buffer time. 
-                # Therefore the total interval between observation refresh attempts will be
-                # 30 + 5 + 2 = 37 minutes. 
+                # of 30 minutes, the updates of the half hourly data at the BoM web site 
+                # seem to occur at 5 minutes past the data timestamp so the real time to 
+                # the next update is 30 minutes (for the data) + 5 minutes (for the web 
+                # server to receive the data update). Then I'll add 2 minutes of buffer 
+                # time to ensure that the next query will see new data. 
+                # Therefore the total time from the last data timestamp to the next query
+                # will be 30 + 5 + 2 = 37 minutes. From that time the periodic task runs
+                # at intervals of Update_Frequency_In_Seconds seconds.
                 next_refresh_time = refresh_utc + datetime.timedelta(minutes=37)
+                now_utc = datetime.datetime.utcnow()
                 time_until_next_refresh = next_refresh_time - now_utc
-                logging.info("Scheduling periodic observation retrieval task to begin after delay of: %s" % time_until_next_refresh)
+                logging.info("Scheduling the periodic observation retrieval task to begin after delay of: %s" % time_until_next_refresh)
                 delay_in_seconds = time_until_next_refresh.total_seconds()
                 reactor.callLater(delay_in_seconds, self.startPeriodicRetrievalTask)
             else:
                 logging.error("Could not extract most recent BOM refresh time from %s field" % AIFSTIME_UTC)
-                
-        def retrievalFailure(reason):
-            logging.error("First BoM observation retrieval failed: %s" % str(reason))
-            # schedule another attempt in 60 seconds.
-            logging.info("Scheduling another attempt to retrieve first BoM observation")
-            reactor.callLater(60, self.retrieveFirstObservations)
-
-        d = self.get_observations(self.observation_url)
-        d.addCallback(retrievalSuccess)
-        d.addErrback(retrievalFailure)     
         
+        except Exception, ex:
+            logging.error("First BoM observation retrieval failed: %s" % str(ex))
+            # schedule another attempt in 10 seconds.
+            logging.info("Scheduling another attempt to retrieve first BoM observation")
+            reactor.callLater(10, self.retrieveFirstObservations)
+        
+        defer.returnValue(True)
+                
         
     def startPeriodicRetrievalTask(self):
         """
         Begin the looping call that will retrieve the latest BoM observation
         """
-        self.bomUpdateTask = LoopingCall(self.retrieveObservations)
+        self.bomUpdateTask = LoopingCall(self._retrieveObservations)
         self.bomUpdateTask.start(Client.Update_Frequency_In_Seconds, now=True)
         logging.info("Starting periodic BoM observation retrieval task")       
 
 
-    def retrieveObservations(self):
+    @defer.inlineCallbacks
+    def _retrieveObservations(self):
         """
         Retrieve the latest BoM observation and store it
         """
-        def storeObservations(observations):
-            logging.info("BoM Observation retrieved successfully")
-            self.observations = observations
-        d = self.get_observations(self.observation_url)
-        d.addCallback(storeObservations)
+        observations = yield self.get_observations(self.observation_url)
+        logging.info("BoM Observation retrieved successfully")
+        self.observations = observations
+        defer.returnValue(observations)
 
-
+            
+    @defer.inlineCallbacks
     def get_observations(self, observation_url):
         """ 
-        Retrieve the latest observations, in JSON format, from the BOM. 
+        Retrieve the latest observations from the BOM in JSON format.
+        
         Returns a deferred that will eventually return an Observation 
         object with attributes populated from parsing the JSON update.
         
         @return: A deferred that returns an Observations object
         @rtype: defer.Deferred
         """
-        def retrievalSuccess(jsonString):
+        try:         
+            logging.debug("Requesting new observation data from: %s" % observation_url)
+            jsonString = yield getPage(observation_url)
             logging.debug("Retrieved new observation data")
             jsonData = json.loads(jsonString)
             observations = Observations(jsonData)
-            return observations
-            
-        def retrievalFailure(reason):
+            defer.returnValue(observations)
+        except Exception, ex:
             logging.error("Unable to retrieve observations data: %s" % str(reason))
-                    
-        logging.debug("Requesting new observation data from: %s" % observation_url)
-        d = getPage(observation_url)
-        d.addCallback(retrievalSuccess)
-        d.addErrback(retrievalFailure)
-        return d
+            defer.returnValue(None)
+
 
 
 
@@ -371,7 +361,7 @@ def get_observations(observation_url):
     """ 
     Retrieve the latest observations from the BOM. 
     Returns a deferred to the caller that will eventually return a 
-    Observations object.
+    Observations object or None.
     
     @return: A deferred that returns a Observations object
     @rtype: defer.Deferred
@@ -385,9 +375,13 @@ def get_observations(observation_url):
 
 if __name__ == "__main__":
     
-    # test script
+    # This test script runs an observations client which keeps it observations
+    # data up to date using the least number of queries to the BOM. At 60
+    # second intervals the current observation data held by the client is
+    # printed out. If you leave the script run you should see that the data is
+    # updated - though note that the update rate is in line with the data update 
+    # rate used on the BOM site which is 30 minutes.
     
-
     # Send Twisted log messages to logging logger
     from twisted.python import log
     observer = log.PythonLoggingObserver()

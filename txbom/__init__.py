@@ -3,7 +3,7 @@
 # Data definitions extracted from http://www.bom.gov.au/inside/itb/dm/idcodes/struc.shtml
 #
 
-version = (0,0,1)
+version = (0,0,2)
 
 
 # General form of the ID Code

@@ -26,14 +26,14 @@ Install
     
 For other download options (zip, tarball) visit the github web page of `txCurrentCost <https://github.com/claws/txBOM>`.
 
-2. Install txBOM module into your Python distribution::
+2. Install txbom package into your Python distribution::
   
     sudo python setup.py install
     
 3. Test::
 
     $ python
-    >>> import txBOM
+    >>> import txbom
     >>>
 
 
@@ -42,64 +42,59 @@ Example
 
 Perform a one off retrieval of the current weather forecast for Adelaide::
 
-    from twisted.internet import reactor
+    from twisted.internet import reactor, defer
     import logging
-    import txBOM.forecasts
+    import txbom.forecasts
 
     logging.basicConfig(level=logging.DEBUG)
 
     # Adelaide forecast identifier
     forecast_id = "IDS10034"
-    
-    def begin(forecast_id):
+   
+    @defer.inlineCallbacks
+    def demo(forecast_id):
         
-        def print_forecast(forecast):
-            print forecast
-            return True
+        forecast = yield txbom.forecasts.get_forecast(forecast_id)
+        print forecast
+        # this is the end of the test, stop reactor to finish script
+        reactor.callLater(0.1, reactor.stop)
+        defer.returnValue(True)
         
-        def shutdown(result):
-            # Allow a second for ftp quit to complete.
-            reactor.callLater(1.0, reactor.stop)
-            
-        d = txBOM.forecasts.get_forecast(forecast_id)
-        d.addCallback(print_forecast)
-        d.addCallback(shutdown)
-        
-    reactor.callWhenRunning(begin, forecast_id)
+    reactor.callWhenRunning(demo, forecast_id)
     reactor.run()
 
-
+ 
 Perform a one off retrieval of weather observations for Adelaide::
 
     from twisted.internet import reactor
     import logging
-    import txBOM.observations
+    import txbom.observations
 
     logging.basicConfig(level=logging.DEBUG)
 
     # Adelaide observations identifier
     observation_url = "http://www.bom.gov.au/fwo/IDS60901/IDS60901.94675.json"
 
-    def print_observation(observations):
-        if observations.current:
-            print observations.current
+    @defer.inlineCallbacks
+    def demo(observation_url):
+        observations = yield txbom.observations.get_observation(observation_url)
+        if observations:
+            print observations
         else:
-            print "No current observation"
-
+            print "No observations?"
         # this is the end of the test, stop reactor to finish script
-        reactor.callLater(1.0, reactor.stop)
+        reactor.callLater(0.1, reactor.stop)
+        defer.returnValue(True)
 
-    d = txBOM.observations.get_observation(observation_url)
-    d.addCallback(print_observation)
+    reactor.callWhenRunning(demo, observation_url)
     reactor.run()
-
 
 
 Use the observations client to maintain up to date observations (use Ctrl+C to exit script)::
 
     from twisted.internet import reactor
     import logging
-    import txBOM.observations
+    import txbom.observations
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -116,7 +111,7 @@ Use the observations client to maintain up to date observations (use Ctrl+C to e
             print "No observations"
 
 
-    client = txBOM.observations.Client(observation_url)
+    client = txbom.observations.Client(observation_url)
 
     # strart the client's periodic observations update service.
     reactor.callWhenRunning(client.start)
