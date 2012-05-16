@@ -216,14 +216,15 @@ class Client(object):
     Client's get_observations method is called. 
     
     The second mode will keep the client's observations attribute
-    up to date by running a periodic task the retrieves the latest observation.
-    The update routine used in this mode is optimized in that it
-    inspects the first response and determines the appropriate time to begin
-    the periodic observations retrieval such that the minimum number of
-    requests are made to keep the observations up to date.
+    up to date by running a periodic task that retrieves the latest observation.
+    The update routine used in this mode is optimized to make the fewest
+    update requests as possible to maintain current data. It inspects the first 
+    response and determines the appropriate time to begin the periodic 
+    observations retrieval such that the minimum number of requests are 
+    made to keep the observations up to date.
     """
     
-    # Perform a observation retrieval every 30 minutes. This is how often
+    # Perform an observation retrieval every 30 minutes. This is how often
     # the data is refreshed on the BoM website. There is no point requesting
     # updates any faster.
     Update_Frequency_In_Seconds = 30 * 60
@@ -279,6 +280,8 @@ class Client(object):
         try:
             observations = yield self.get_observations(self.observation_url)
             self.observations = observations
+        
+            self.observationsReceived(observations)
             
             if observations.current.aifstime_utc:
                 refresh_utc = datetime.datetime.strptime(observations.current.aifstime_utc, "%Y%m%d%H%M%S")
@@ -326,6 +329,9 @@ class Client(object):
         observations = yield self.get_observations(self.observation_url)
         logging.info("BoM Observation retrieved successfully")
         self.observations = observations
+        
+        self.observationsReceived(observations)
+
         defer.returnValue(observations)
 
             
@@ -353,7 +359,12 @@ class Client(object):
 
 
 
-
+    def observationsReceived(self, observations):
+        """
+        Override this method to receive observation updates as they are
+        retrieved.
+        """
+        pass
 
 
 
@@ -366,7 +377,7 @@ def get_observations(observation_url):
     @return: A deferred that returns a Observations object
     @rtype: defer.Deferred
     """
-    log.debug("Retrieving observations from url %s" % (observation_url))
+    logging.debug("Retrieving observations from url %s" % (observation_url))
     return Client().get_observations(observation_url)
 
 

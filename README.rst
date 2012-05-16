@@ -43,10 +43,7 @@ Example
 Perform a one off retrieval of the current weather forecast for Adelaide::
 
     from twisted.internet import reactor, defer
-    import logging
     import txbom.forecasts
-
-    logging.basicConfig(level=logging.DEBUG)
 
     # Adelaide forecast identifier
     forecast_id = "IDS10034"
@@ -56,6 +53,7 @@ Perform a one off retrieval of the current weather forecast for Adelaide::
         
         forecast = yield txbom.forecasts.get_forecast(forecast_id)
         print forecast
+        
         # this is the end of the test, stop reactor to finish script
         reactor.callLater(0.1, reactor.stop)
         defer.returnValue(True)
@@ -66,7 +64,7 @@ Perform a one off retrieval of the current weather forecast for Adelaide::
  
 Perform a one off retrieval of weather observations for Adelaide::
 
-    from twisted.internet import reactor
+    from twisted.internet import reactor, defer
     import logging
     import txbom.observations
 
@@ -82,6 +80,7 @@ Perform a one off retrieval of weather observations for Adelaide::
             print observations
         else:
             print "No observations?"
+        
         # this is the end of the test, stop reactor to finish script
         reactor.callLater(0.1, reactor.stop)
         defer.returnValue(True)
@@ -93,10 +92,7 @@ Perform a one off retrieval of weather observations for Adelaide::
 Use the observations client to maintain up to date observations (use Ctrl+C to exit script)::
 
     from twisted.internet import reactor
-    import logging
     import txbom.observations
-
-    logging.basicConfig(level=logging.DEBUG)
 
     # Adelaide observations identifier
     observation_url = "http://www.bom.gov.au/fwo/IDS60901/IDS60901.94675.json"
@@ -116,8 +112,8 @@ Use the observations client to maintain up to date observations (use Ctrl+C to e
     # strart the client's periodic observations update service.
     reactor.callWhenRunning(client.start)
 
-    # create a looping call that executes every minute that
-    # will print out the client's current observations data.
+    # Create a looping call that executes every minute to 
+    # print out the client's current observations data.
     # If the script is left to run it should be observed that
     # the client updates its store of observations periodically.
     c = LoopingCall(print_current_observation, client)
