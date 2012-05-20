@@ -136,3 +136,5 @@ WindDirectionsToBearing = {"N" : 90.0,
                           "NW" : 135.0,
                           "NNW" : 112.5,
                           "CALM" : None}
+
+
