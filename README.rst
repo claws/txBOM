@@ -24,7 +24,7 @@ Install
 
     $ git clone git://github.com/claws/txBOM.git
     
-For other download options (zip, tarball) visit the github web page of `txCurrentCost <https://github.com/claws/txBOM>`.
+For other download options (zip, tarball) visit the github web page of `txBOM <https://github.com/claws/txBOM>`.
 
 2. Install txbom package into your Python distribution::
   

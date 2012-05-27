@@ -92,7 +92,10 @@ def expand_contractions(data):
                     "W'ly" : "westerly"}
     for contraction, replacement in contractions.items():
         data = data.replace(contraction, replacement)
-    
+   
+    # change 'km/h' to 'kilometers per hour'
+    data = data.replace("km/h", "kilometers per hour")
+
     # change 'S/SE' to 'S to SE'
     tmp = []
     for d in data.split(" "):
@@ -105,8 +108,8 @@ def expand_contractions(data):
     
     # Convert 'S' to 'southerly'
     # Process wind direction keys from longest to shortest so that
-    # we don't northerlyeasterly for NE. Instead we should end up
-    # with north easterly.
+    # we don't get 'northerlyeasterly' from NE. Instead we should end 
+    # up with 'north easterly'.
     keys = txbom.WindDirections.keys()
     keys.sort(key=len)
     keys.reverse()
@@ -120,7 +123,7 @@ def expand_contractions(data):
 def get_summary_information(data):
     """
     Return a tuple of summary data extracted from the forecast string
-    The tuple returned contains X items, identifier, location, state
+    The tuple returned contains 5 items, identifier, location, state
     time, date.
     """
 
@@ -564,7 +567,8 @@ def forecastToDict(forecast):
                     "fcast_tomorrow_precis" : tomorrow_precis,
                     "fcast_tomorrow_minimum" : tomorrow_min,
                     "fcast_tomorrow_maximum" : tomorrow_max,
-                    "fcast_five_days" : next_five_days}
+                    "fcast_five_days" : next_five_days,
+                    "fcast_raw" : forecast}
     
     return forecastDict
 
