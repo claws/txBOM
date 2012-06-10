@@ -106,7 +106,7 @@ def expand_contractions(data):
         tmp.append(d)
     data = " ".join(tmp)
     
-    # Convert 'S' to 'southerly'
+    # Convert ' S ' to ' southerly '
     # Process wind direction keys from longest to shortest so that
     # we don't get 'northerlyeasterly' from NE. Instead we should end 
     # up with 'north easterly'.
@@ -115,7 +115,9 @@ def expand_contractions(data):
     keys.reverse()
     for k in keys:
         v = txbom.WindDirections[k]
-        data = data.replace(k, v)
+        replace_str = " %s " % k
+        sub_str = " %s " % v
+        data = data.replace(replace_str, sub_str)
     
     return data
 
@@ -456,9 +458,14 @@ def get_five_day_forecast(data):
 
             items = forecast_line.split("  ")
             items = filter(None, items) # remove empty items
-            _, precis, temperature_min, temperature_max = items
-            
 
+            if len(items) == 3:
+                # occasionally the precis and min temp are not separated
+                # by a space. Eg. Sunny.Min 9
+                _, precis_and_min, temperature_max = items
+                precis, temperature_min = precis_and_min.rsplit(".", 1)
+            else:
+                _, precis, temperature_min, temperature_max = items
             
             precis = precis.strip()
             if precis.endswith("."):
