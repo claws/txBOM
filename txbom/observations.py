@@ -327,14 +327,16 @@ class Client(object):
         Retrieve the latest BoM observation and store it
         """
         observations = yield self.get_observations(self.observation_url)
-        logging.info("BoM Observation retrieved successfully")
-        self.observations = observations
+        if observations:
+            logging.info("BoM Observation retrieved successfully")
+            self.observations = observations
+
+            # pass observations off the user provided handler
+            self.observationsReceived(observations)
         
-        self.observationsReceived(observations)
-
-        defer.returnValue(observations)
-
-            
+        defer.returnValue(None)
+        
+    
     @defer.inlineCallbacks
     def get_observations(self, observation_url):
         """ 

@@ -376,14 +376,17 @@ def get_forecast_for_tomorrow(data):
             forecast_line = tomorrow_details.split("\n")[0]
             items = forecast_line.split("  ")
             items = filter(None, items) # remove empty items
-            location, _, temperature_min, temperature_max = items
+            try:
+                location, _, temperature_min, temperature_max = items
     
-            temperature_min = temperature_min.replace("Min", "")
-            temperature_min = temperature_min.strip()
+                temperature_min = temperature_min.replace("Min", "")
+                temperature_min = temperature_min.strip()
             
-            temperature_max = temperature_max.replace("Max", "")
-            temperature_max = temperature_max.strip()    
+                temperature_max = temperature_max.replace("Max", "")
+                temperature_max = temperature_max.strip()    
 
+            except ValueError, ex:
+                logging.error("%s. Tried to extract 4 items from line: \'%s\'. items=%s" % (str(ex), forecast_line, str(items)))
     
     else:
         # try one of the other formats which looks like this:
