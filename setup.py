@@ -8,15 +8,17 @@ from distutils.core import setup
 import txbom
 
 
-long_description = """txBOM is a Python Twisted package that allows you to iretrieve forecasts and observations
-from the Australian Bureau of Meteorology.
-Use it to integrate non blocking retrieval of Australian Bureau of Meteorology forecasts
-and observations into your Python Twisted application.
+long_description = """txBOM is a Python Twisted package that lets you retrieve forecasts
+and observations from the Australian Bureau of Meteorology (BOM).
+
+Use it to integrate non blocking retrieval of Australian Bureau of
+Meteorology forecasts and observations into your Python Twisted
+application.
 """
 
-setup(name='txBOM',
-      version='.'.join(txbom.version),
-      description='txBOM is a Python Twisted package that allows you to iretrieve forecasts and observations from the Australian Bureau of Meteorology.',
+setup(name='txbom',
+      version='.'.join([str(x) for x in txbom.version]),
+      description='txbom is a Python Twisted package that lets you retrieve forecasts and observations from the Australian Bureau of Meteorology (BOM).',
       long_description=long_description,
       author='Chris Laws',
       author_email='clawsicus@gmail.com',
@@ -31,9 +33,10 @@ setup(name='txBOM',
                    'License :: OSI Approved :: MIT License',
                    'Operating System :: OS Independent',
                    'Programming Language :: Python',
-                   'Framework :: Twisted']
+                   'Framework :: Twisted',
+                   'Topic :: Communications',
+                   'Topic :: Home Automation',
+                   'Topic :: System :: Monitoring',
+                   'Topic :: Software Development :: Libraries :: Python Modules'],
+      requires=['Twisted']
       )
-
-
-
-

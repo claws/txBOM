@@ -1,9 +1,14 @@
 
-#
-# Data definitions extracted from http://www.bom.gov.au/inside/itb/dm/idcodes/struc.shtml
-#
+'''
+txBOM lets you integrate asynchronous weather forecast and
+observations retrieval from the Australian Bureau of Meteorology
+into your Twisted application.
 
-version = (0,0,2)
+Data definitions extracted from http://www.bom.gov.au/inside/itb/dm/idcodes/struc.shtml
+'''
+
+
+version = (0, 0, 2)
 
 
 # General form of the ID Code
@@ -38,16 +43,16 @@ version = (0,0,2)
 ACT = "N"   # e.g. IDNxxxxx
 Bundled = "B"
 Climate = "C"
-NT  = "D"   # e.g. IDDxxxxx
+NT = "D"   # e.g. IDDxxxxx
 Satellite = "E"
 Graphical = "G"
 NSW = "N"   # e.g. IDNxxxxx
 QLD = "Q"   # e.g. IDQxxxxx
 Radar = "R"
-SA  = "S"   # e.g. IDSxxxxx
+SA = "S"   # e.g. IDSxxxxx
 TAS = "T"   # e.g. IDTxxxxx
-VIC = "V"   # e.g. IDVxxxxx 
-WA  = "W"   # e.g. IDWxxxxx
+VIC = "V"   # e.g. IDVxxxxx
+WA = "W"   # e.g. IDWxxxxx
 Digital_Fax = "X"
 National_Operations_Centre = "Y"
 
@@ -67,18 +72,18 @@ Categories = [ACT,
               Digital_Fax,
               National_Operations_Centre]
 
-StateCategories = [ACT, 
-                   NSW, 
-                   NT, 
-                   QLD, 
-                   SA, 
-                   TAS, 
-                   VIC, 
+StateCategories = [ACT,
+                   NSW,
+                   NT,
+                   QLD,
+                   SA,
+                   TAS,
+                   VIC,
                    WA]
 
 # Individual product identifier (idcXXXXX)
 #
-# The identifier field varies in length and composition, depending upon the category of product - c. 
+# The identifier field varies in length and composition, depending upon the category of product - c.
 # For full details, refer to the Product Identification Code Listing.
 #
 # Optional file extension (idcxxxxx.EXT)
@@ -98,43 +103,40 @@ StateCategories = [ACT,
 # .wav = voice file
 
 
-
-
 # Convert wind direction acronym to words
-WindDirections = {"N" : "northerly",
-                  "NNE" : "north north easterly",
-                  "NE" : "north easterly",
-                  "ENE" : "east north easterly",
-                  "E" : "easterly",
-                  "ESE" : "east south easterly",
-                  "SE" : "south easterly",
-                  "SSE" : "south south easterly",
-                  "S" : "southerly",
-                  "SSW" : "south south westerly",
-                  "SW" : "south westerly",
-                  "WSW" : "west south westerly",
-                  "W" : "westerly",
-                  "WNW" : "west north westerly",
-                  "NW" : "north westerly",
-                  "NNW" : "north north westerly",
-                  "CALM" : "calm"}
+WindDirections = {"N": "northerly",
+                  "NNE": "north north easterly",
+                  "NE": "north easterly",
+                  "ENE": "east north easterly",
+                  "E": "easterly",
+                  "ESE": "east south easterly",
+                  "SE": "south easterly",
+                  "SSE": "south south easterly",
+                  "S": "southerly",
+                  "SSW": "south south westerly",
+                  "SW": "south westerly",
+                  "WSW": "west south westerly",
+                  "W": "westerly",
+                  "WNW": "west north westerly",
+                  "NW": "north westerly",
+                  "NNW": "north north westerly",
+                  "CALM": "calm"}
 
-WindDirectionsToBearing = {"N" : 90.0,
-                          "NNE" : 67.5,
-                          "NE" : 45.0,
-                          "ENE" : 22.5,
-                          "E" : 0.0,
-                          "ESE" : 337.5,
-                          "SE" : 315,
-                          "SSE" : 292.5,
-                          "S" : 270.0,
-                          "SSW" : 247.5,
-                          "SW" : 225.0,
-                          "WSW" : 202.5,
-                          "W" : 180.0,
-                          "WNW" : 157.5,
-                          "NW" : 135.0,
-                          "NNW" : 112.5,
-                          "CALM" : None}
-
+WindDirectionsToBearing = {"N": 90.0,
+                           "NNE": 67.5,
+                           "NE": 45.0,
+                           "ENE": 22.5,
+                           "E": 0.0,
+                           "ESE": 337.5,
+                           "SE": 315,
+                           "SSE": 292.5,
+                           "S": 270.0,
+                           "SSW": 247.5,
+                           "SW": 225.0,
+                           "WSW": 202.5,
+                           "W": 180.0,
+                           "WNW": 157.5,
+                           "NW": 135.0,
+                           "NNW": 112.5,
+                           "CALM": None}
 
