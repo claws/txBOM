@@ -4,6 +4,7 @@ txBOM is a Python Twisted package that lets you retrieve forecasts and observati
 
 Use it to integrate non blocking retrieval of Australian Bureau of Meteorology forecasts and observations into your Python Twisted application.
 
+![PyPi version](https://pypip.in/v/txbom/badge.png) &nbsp;&nbsp; ![PyPi version](https://pypip.in/d/txbom/badge.png)
 
 ## Software Dependencies
 
