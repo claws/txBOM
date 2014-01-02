@@ -79,9 +79,9 @@ Sunny. Very hot. Winds northeast to northwesterly 25 to 40 km/h tending west to
 northwesterly 20 to 30 km/h in the early afternoon ahead of milder south to
 southwesterly 20 to 30 km/h late afternoon or evening.
 
-City Centre         Sunny. Evening milder change. Max 44  
-Chance of any rainfall: 0%            
-Rainfall: 0 mm                
+City Centre         Sunny. Evening milder change. Max 44
+Chance of any rainfall: 0%
+Rainfall: 0 mm
 <raw forecast text truncated for brevity>
 
 Forecast dict:
@@ -220,3 +220,4 @@ INFO:twisted:Stopping factory <HTTPClientFactory: http://www.bom.gov.au/fwo/IDS6
 * Investigate adding locations (State, City) as a separate package so that users don't need to determine the forecast identifier or observation url.
 
 
+[![Analytics](https://ga-beacon.appspot.com/UA-29867375-2/txBOM/readme?pixel)](https://github.com/claws/txBOM)
