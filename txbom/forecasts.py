@@ -431,14 +431,16 @@ def get_five_day_forecast(data):
 
     forecasts = []
     chunks = data.split("\n\n")
+    chunks = [chunk.lstrip() for chunk in chunks]  # remove any leading '\n'
     for i, chunk in enumerate(chunks):
         if chunk.startswith("Forecast for "):
-            forecasts.append(i)
+            if not chunk.startswith("Forecast for the rest of "):
+                forecasts.append(i)
 
     FiveForecastsPresent = len(forecasts) > 5
 
     if FiveForecastsPresent:
-        FiveForcasts = forecasts[-5:]
+        FiveForcasts = forecasts[:5]
         for index in FiveForcasts:
 
             forecast_line = chunks[index]
